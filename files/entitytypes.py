@@ -3,19 +3,18 @@ from classes import Entity
 #Enemy Subclass
 class Enemy(Entity):
     def __init__(self, position, turnlimit,symbol):
-        super().__init__(position)
+        super().__init__(position, symbol)
         self.target = None
         self.turnlimit = turnlimit
         self.currentturn = 0
-        self.symbol = symbol
-
+    
     def changetarget(self, newtarget: Entity):
         self.target = newtarget
 
 
 class Mario(Enemy):
     def __init__(self, position):
-        super().__init__(position,1, "M")
+        super().__init__(position,2, "M")
     
     def getmovement(self):
         if self.currentturn == self.turnlimit:
@@ -33,7 +32,7 @@ class Mario(Enemy):
 
 class Luigi(Enemy):
     def __init__(self, position):
-        super().__init__(position,0, "L")
+        super().__init__(position,1, "L")
 
     def getmovement(self):
         if self.currentturn == self.turnlimit:
@@ -51,7 +50,7 @@ class Luigi(Enemy):
 
 class Jem(Enemy):
     def __init__(self, position):
-        super().__init__(position,1,"J")
+        super().__init__(position,2,"J")
 
     def getmovement(self):
         if self.currentturn == self.turnlimit:
@@ -71,8 +70,8 @@ class Jem(Enemy):
         
 
 class Player(Entity):
-    def __init__(self, position):
-        super().__init__(position)
+    def __init__(self, position, ):
+        super().__init__(position, "+")
 
     def getmovement(self, command):
         movements = {

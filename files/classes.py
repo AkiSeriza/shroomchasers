@@ -38,41 +38,48 @@ class Grid:
 
     def displaygrid(self, entities, player):
         entitydict = {tuple(x.position): x for x in entities}
+        entitydict[tuple(player.position)] = player
         for i in range(self.dimensions[0]):
             for j in range(self.dimensions[1]):
-                current_cell = self.getcell([i,j])
-                if current_cell.feature != None:
-                    print(current_cell.feature[0], end=" ")
-                elif player.position == [i,j]:
-                    print("+", end=" ")
-                elif (i,j) in entitydict:                    
-                    print((entitydict[(i,j)]).symbol, end=" ")
+                position = (i, j)
+                feature_symbol = self.cells[position].feature.symbol
+                if position in entitydict:
+                    occupant_symbol = entitydict[position].symbol
+                    if feature_symbol == ".":
+                        feature_symbol = ""
+                elif position == tuple(player.position):
+                    occupant_symbol = "+"
                 else:
-                    print(".", end=" ")
+                    occupant_symbol = ""
+                print(f"{feature_symbol}{occupant_symbol}", end=" ")
+                    
             print()
 
 class Item:
     def __init__(self):
         pass
 
-class TileFeature:
-    def __init__(self, passable = True):
-        self.passable = passable
-
-    def onTouch(self, entity:Entity, game:Game):
-        pass
-
 class Entity:
     #Core Entitity unit, see entitytypes.py for behaviours
-    def __init__(self, position):
+    def __init__(self, position, symbol):
         self.position = position
+        self.symbol = symbol
         self.isturn = False
+
 
     def changeposition(self, newpos):
         self.position = newpos
 
     #Returns a tuple which tells you which direction it wants to go
     def getmovement(self):
+        pass
+
+class TileFeature:
+    def __init__(self,symbol, passable = True):
+        self.symbol = symbol
+        self.passable = passable
+
+    def onTouch(self, entity:Entity, game):
         pass
 
 #Game handler
@@ -101,6 +108,7 @@ class Game:
                     print("Invalid Move")
                     continue
                 self.player.changeposition(newpos) #resolves turn
+                self.grid.getcell(newpos).feature.onTouch(self.player, self)
                 self.player.isturn = False
                 if self.iswon == True:
                     print("You Win!")
@@ -108,17 +116,22 @@ class Game:
             for currententity in self.entities:
                 if currententity.position == self.player.position:
                     self.islost = True
+                if self.islost == True:
+                    print("You Lose")
+                    self.isplaying = False
+                    return   
                 currententity.isturn = True
                 currententity.currentturn = 0
                 while currententity.isturn == True:
+                    currententity.currentturn += 1
                     enemymove = currententity.getmovement()
                     validity, newpos = self.grid.checkifvalidmove(currententity.position, enemymove)
                     if not validity:
                         continue
                     currententity.changeposition(newpos)
+                    self.grid.getcell(newpos).feature.onTouch(currententity, self)
                     if currententity.position == self.player.position:
                         self.islost = True
-                    currententity.currentturn += 1
                     print(f"{currententity.currentturn}; {currententity.turnlimit}")
             print("------------------------:-------------------------")
             self.grid.displaygrid(self.entities,self.player)

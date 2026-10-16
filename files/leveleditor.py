@@ -1,9 +1,12 @@
 import classes as Game
 import entitytypes as Entity
+import tilefeatures as Tiles
+
 FEATURES = {
-    "#": "Rock",
-    "^": "Trap",
-    "G": "Goal",
+    "#": Tiles.Rock,
+    "^": Tiles.Trap,
+    "G": Tiles.Goal,
+    ".": Tiles.Normal
 }
 
 ENTITIES = {
@@ -14,7 +17,7 @@ ENTITIES = {
 
 def mapgenerator(level: str):
     if level == None:
-        ValueError
+        raise ValueError
     partiallyparsed = level.split("\n")
     dimensions = partiallyparsed[0].split(" ")
     rows, columns = [int(x) for x in dimensions]
@@ -29,14 +32,16 @@ def mapgenerator(level: str):
             cell = Game.Cell(f"{i},{j}", heightmap[i][j])
             current_envi = entitymap[i][j]
             if current_envi in FEATURES:
-                cell.addfeature(FEATURES[current_envi])
+                cell.addfeature(FEATURES[current_envi]())
             elif current_envi in ENTITIES:
+                cell.addfeature(Tiles.Normal())
                 entitytype: Game.Entity = ENTITIES[current_envi]
                 enemy = entitytype([i,j])
                 entities.append(
                     enemy
                 )
             elif current_envi == "+":
+                cell.addfeature(Tiles.Normal())
                 player = Entity.Player([i,j])
             cells[(i,j)] = cell
     grid = Game.Grid(cells,[rows, columns])
