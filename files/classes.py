@@ -1,19 +1,17 @@
 ##General Idea: THe entire game order is handled by the Game Object, instantiated each time a game is started. 
 
 class Cell:
-    def __init__(self,name, height):
+    def __init__(self,name, height, feature = None):
         self.name = name
         self.height = height
-        self.feature = None
 
     def addfeature(self,feature):
-        self.feature = feature
+        self.feature:TileFeature = feature
     
 class Grid:
     def __init__(self, cells, dimensions: list[int,int]):
         self.cells: dict[tuple[int, int], Cell] = cells
         self.dimensions = dimensions
-
 
     def enumeratecells(self):
         for i in self.cells:
@@ -34,7 +32,7 @@ class Grid:
             return False, 0
         if new_cell.height > current_cell.height + 1:
             return False, 0
-        if new_cell.feature == "Rock":
+        if new_cell.feature.passable == False:
             return False, 0
         return True, new_position
 
@@ -53,13 +51,16 @@ class Grid:
                     print(".", end=" ")
             print()
 
-
-
 class Item:
     def __init__(self):
         pass
 
+class TileFeature:
+    def __init__(self, passable = True):
+        self.passable = passable
 
+    def onTouch(self, entity:Entity, game:Game):
+        pass
 
 class Entity:
     #Core Entitity unit, see entitytypes.py for behaviours
@@ -74,8 +75,6 @@ class Entity:
     def getmovement(self):
         pass
 
-
-
 #Game handler
 class Game:
     def __init__(self, grid, player, entities):
@@ -83,10 +82,16 @@ class Game:
         self.player: Entity = player
         self.entities: list[Entity] = entities
         self.isplaying = True
+        self.iswon = False
+        self.islost = False
 
     def startgame(self):
         
         while self.isplaying:
+            if self.islost == True:
+                print("You Lose")
+                self.isplaying = False
+                return     
             self.player.isturn = True
             while self.player.isturn:
                 playermove = self.player.getmovement(input())
@@ -97,27 +102,25 @@ class Game:
                     continue
                 self.player.changeposition(newpos) #resolves turn
                 self.player.isturn = False
+                if self.iswon == True:
+                    print("You Win!")
+                    return               
             for currententity in self.entities:
                 if currententity.position == self.player.position:
-                    print("You Lose")
-                    self.isplaying = False
-                    return
+                    self.islost = True
                 currententity.isturn = True
                 currententity.currentturn = 0
                 while currententity.isturn == True:
                     enemymove = currententity.getmovement()
-
                     validity, newpos = self.grid.checkifvalidmove(currententity.position, enemymove)
                     if not validity:
                         continue
                     currententity.changeposition(newpos)
                     if currententity.position == self.player.position:
-                        print("You Lose")
-                        self.isplaying = False
-                        return
+                        self.islost = True
                     currententity.currentturn += 1
                     print(f"{currententity.currentturn}; {currententity.turnlimit}")
-            print(f"{[x for x in self.grid.cells]}; Player at {self.player.position}; Enemies: {[x.position for x in self.entities]}")
+            print("------------------------:-------------------------")
             self.grid.displaygrid(self.entities,self.player)
         
             
