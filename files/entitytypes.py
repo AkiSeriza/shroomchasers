@@ -2,9 +2,12 @@ from classes import Entity
 
 #Enemy Subclass
 class Enemy(Entity):
-    def __init__(self, position):
+    def __init__(self, position, turnlimit,symbol):
         super().__init__(position)
         self.target = None
+        self.turnlimit = turnlimit
+        self.currentturn = 0
+        self.symbol = symbol
 
     def changetarget(self, newtarget: Entity):
         self.target = newtarget
@@ -12,10 +15,11 @@ class Enemy(Entity):
 
 class Mario(Enemy):
     def __init__(self, position):
-        super().__init__(position)
-
+        super().__init__(position,1, "M")
+    
     def getmovement(self):
-        self.isturn =  False
+        if self.currentturn == self.turnlimit:
+            self.isturn  = False        
         xdir = self.position[0] - self.target.position[0]
         if xdir > 0:
             return (-1,0)
@@ -26,6 +30,43 @@ class Mario(Enemy):
             return (0,-1)
         if ydir < 0:
             return (0,1)
+
+class Luigi(Enemy):
+    def __init__(self, position):
+        super().__init__(position,0, "L")
+
+    def getmovement(self):
+        if self.currentturn == self.turnlimit:
+            self.isturn  = False        
+        xdir = self.position[0] - self.target.position[0]
+        if xdir > 0:
+            return (-1,0)
+        if xdir < 0:
+            return (1,0)
+        ydir = self.position[1] - self.target.position[1]
+        if ydir > 0:
+            return (0,-1)
+        if ydir < 0:
+            return (0,1)
+
+class Jem(Enemy):
+    def __init__(self, position):
+        super().__init__(position,1,"J")
+
+    def getmovement(self):
+        if self.currentturn == self.turnlimit:
+            self.isturn  = False     
+        ydir = self.position[1] - self.target.position[1]
+        if ydir > 0:
+            return (0,-1)
+        if ydir < 0:
+            return (0,1)   
+        xdir = self.position[0] - self.target.position[0]
+        if xdir > 0:
+            return (-1,0)
+        if xdir < 0:
+            return (1,0)
+
 
         
 

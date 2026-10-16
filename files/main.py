@@ -5,12 +5,12 @@ from leveleditor import mapgenerator
 map = """4 4
 1 1 1 1
 1 1 1 1
-1 1 1 1
-1 1 1 1
+1 2 3 4
+1 1 1 4
 . . . +
-. . . .
-. . . .
-. . . M"""
+. # . .
+L . . .
+. . . ."""
 
 if __name__ == "__main__":
     grid, player, entities = mapgenerator(map)

@@ -8,8 +8,8 @@ FEATURES = {
 
 ENTITIES = {
     "M": Entity.Mario,
-    "J": "Jem",
-    "L": "Luigi",
+    "J": Entity.Jem,
+    "L": Entity.Luigi,
 }
 
 def mapgenerator(level: str):
@@ -39,7 +39,7 @@ def mapgenerator(level: str):
             elif current_envi == "+":
                 player = Entity.Player([i,j])
             cells[(i,j)] = cell
-    grid = Game.Grid(cells)
+    grid = Game.Grid(cells,[rows, columns])
     grid.enumeratecells()
     for i in entities:
         i.changetarget(player)
