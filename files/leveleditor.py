@@ -1,4 +1,5 @@
 import classes as Game
+import entitytypes as Entity
 FEATURES = {
     "#": "Rock",
     "^": "Trap",
@@ -6,7 +7,7 @@ FEATURES = {
 }
 
 ENTITIES = {
-    "M": "Mario",
+    "M": Entity.Mario,
     "J": "Jem",
     "L": "Luigi",
 }
@@ -21,7 +22,8 @@ def mapgenerator(level: str):
     entitymap = partiallyparsed[rows+1:]
     heightmap = [[int(y) for y in x.split(" ")] for x in heightmap]
     entitymap = [[y for y in x.split(" ")] for x in entitymap]
-    entities, cells = [], {}
+    entities:list[Entity.Enemy] = []
+    cells = {}
     for i in range(rows):
         for j in range(columns):
             cell = Game.Cell(f"{i},{j}", heightmap[i][j])
@@ -29,27 +31,31 @@ def mapgenerator(level: str):
             if current_envi in FEATURES:
                 cell.addfeature(FEATURES[current_envi])
             elif current_envi in ENTITIES:
+                entitytype: Game.Entity = ENTITIES[current_envi]
+                enemy = entitytype([i,j])
                 entities.append(
-                    Game.Entity([i, j], ENTITIES[current_envi])
+                    enemy
                 )
             elif current_envi == "+":
-                player = Game.Player([i, j])
+                player = Entity.Player([i,j])
             cells[(i,j)] = cell
     grid = Game.Grid(cells)
     grid.enumeratecells()
+    for i in entities:
+        i.changetarget(player)
     return grid, player, entities
 
 
 
-
-print(mapgenerator(
-"""4 4
-1 2 3 4
-2 2 3 4
-2 4 3 4
-1 2 3 4
-+ . . .
-. # . .
-. . ^ .
-L # . G
-"""))
+if __name__ == "__main__":
+    print(mapgenerator(
+    """4 4
+    1 1 1 1
+    1 1 1 1
+    1 1 1 1
+    1 1 1 1
+    + . . .
+    . . . .
+    . . . .
+    . . . M
+    """))
