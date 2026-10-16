@@ -1,59 +1,52 @@
-# Shroom
+# Shroom Chasers
 
-lmaooooooooooooooooooooooooooooooooooooooooooooooooo
+A small, text-based grid game prototype. Move around the map, avoid the enemies and traps, and try to reach a goal. It is still a work in progress, so expect rough edges.
 
-## Overview
+## Run it
 
-This project is still in an early stage and acts more like a foundation for a game engine than a complete playable game. It includes:
+The project uses Python's standard library, so no extra packages are needed. From the repository root, run:
 
-- grid and cell structures
-- player movement handling
-- entity and feature definitions
-- level parsing from text-based map input
-- a starting point for a level editor
+```powershell
+python files/main.py
+```
 
-## Project structure
+Use **W**, **A**, **S**, and **D** to move up, left, down, and right.
 
-- `main.py` – intended main entry point for the game
-- `files/classes.py` – core game classes and map generation logic
-- `files/leveleditor.py` – level editor or editor-related functionality scaffold
+## Map format
 
-## Current gameplay model
-
-The core model is built around these main concepts:
-
-- `Cell`: represents a tile with a name, height, and optional feature
-- `Grid`: stores the cell map and can enumerate it
-- `Player`: tracks position and movement commands
-- `Entity`: represents NPCs or non-player objects on the grid
-- `Game`: manages the game loop and player interactions
-
-## Running the project
-
-At the moment, the repository does not yet have a complete game loop wired through `main.py`, so the main logic is being developed in the `files` module.
-
-## Example map format
-
-The parser expects a level in a simple block format:
+Levels are defined as text in `files/main.py`. A level starts with its row and column counts, followed by the height map and then the tile map. Each row contains space-separated values.
 
 ```text
 4 4
-1 2 3 4
-2 2 3 4
-2 4 3 4
-1 2 3 4
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
 + . . .
 . # . .
 . . ^ .
-L # . G
+L . . G
 ```
 
-This format includes:
+The first four rows after the dimensions are the cell heights. The next four rows describe the tiles:
 
-- first line: grid dimensions (`rows columns`)
-- next rows: height map values
-- remaining rows: entity / tile symbols on the map
+| Symbol | Meaning |
+| --- | --- |
+| `.` | Normal floor |
+| `#` | Rock |
+| `^` | Trap |
+| `G` | Goal |
+| `+` | Player start |
+| `L`, `M`, `J` | Enemies |
 
-## Notes
+Rocks cannot be crossed. Touching a trap loses the game, and reaching a goal wins. Enemies move toward the player.
 
-This is a prototype and may change significantly as the game design evolves. The current code establishes the building blocks for a larger text-based action or exploration game.
+## Project layout
+
+- `files/main.py` – sample level and game entry point
+- `files/classes.py` – grid, cell, entity, and game-loop classes
+- `files/entitytypes.py` – player and enemy movement
+- `files/tilefeatures.py` – tile features and their effects
+- `files/leveleditor.py` – parses text maps into grids, players, and enemies
+
+This is an early prototype rather than a finished game, and the code and map format may change as it grows.
