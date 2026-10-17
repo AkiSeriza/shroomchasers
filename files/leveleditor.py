@@ -6,7 +6,8 @@ FEATURES = {
     "#": Tiles.Rock,
     "^": Tiles.Trap,
     "G": Tiles.Goal,
-    ".": Tiles.Normal
+    ".": Tiles.Normal,
+    "P": Tiles.Portal
 }
 
 ENTITIES = {
@@ -30,12 +31,16 @@ def mapgenerator(level: str):
     entitymap = [[y for y in x.split(" ")] for x in entitymap]
     entities:list[Entity.Enemy] = []
     cells = {}
+    portals = []
     for i in range(rows):
         for j in range(columns):
             cell = Game.Cell(f"{i},{j}", heightmap[i][j])
             current_envi = entitymap[i][j]
             if current_envi in FEATURES:
-                cell.addfeature(FEATURES[current_envi]())
+                feature = FEATURES[current_envi]()
+                cell.addfeature(feature)
+                if isinstance(feature, Tiles.Portal):
+                    portals.append((i, j, feature))
             elif current_envi in ENTITIES:
                 cell.addfeature(Tiles.Normal())
                 entitytype: Game.Entity = ENTITIES[current_envi]
@@ -47,6 +52,13 @@ def mapgenerator(level: str):
                 cell.addfeature(Tiles.Normal())
                 player = Entity.Player([i,j])
             cells[(i,j)] = cell
+    if len(portals) not in (0, 2):
+        raise ValueError("A level must contain either zero or exactly two portals")
+    if portals:
+        first_position = portals[0][:2]
+        second_position = portals[1][:2]
+        portals[0][2].link(second_position)
+        portals[1][2].link(first_position)
     grid = Game.Grid(cells,[rows, columns])
     grid.enumeratecells()
     for i in entities:

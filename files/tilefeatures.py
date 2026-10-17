@@ -7,7 +7,7 @@ class Rock(TileFeature):
 
 class Trap(TileFeature):
     def __init__(self, passable=True):
-        super().__init__("^",passable)
+        super().__init__("^", passable)
 
     def onTouch(self,entity, game):
         if isinstance(entity, Player):
@@ -34,3 +34,16 @@ class Normal(TileFeature):
 
     def onTouch(self, entity, game):
         pass
+
+class Portal(TileFeature):
+    def __init__(self, passable=True):
+        super().__init__("O", passable)
+        self.destination = None
+
+    def link(self, destination):
+        self.destination = destination
+
+    def onTouch(self, entity, game):
+        if self.destination is None:
+            raise RuntimeError("Portal is not linked to another portal")
+        entity.changeposition(list(self.destination))

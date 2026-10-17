@@ -76,7 +76,7 @@ class Entity:
         pass
 
 class TileFeature:
-    def __init__(self,symbol, passable = True):
+    def __init__(self,symbol,  passable = True):
         self.symbol = symbol
         self.passable = passable
 
