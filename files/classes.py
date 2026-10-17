@@ -1,7 +1,7 @@
 ##General Idea: THe entire game order is handled by the Game Object, instantiated each time a game is started. 
 
 class Cell:
-    def __init__(self,name, height, feature = None):
+    def __init__(self,name, height):
         self.name = name
         self.height = height
 
@@ -24,9 +24,7 @@ class Grid:
 
     def checkifvalidmove(self,position,movement):
         current_cell = self.getcell(position)
-        print(f"Current Cell: {current_cell}")
         new_position = [position[0] + movement[0], position[1] + movement[1]]
-        print(new_position)
         new_cell = self.getcell(new_position)
         if new_cell == None:
             return False, 0
@@ -74,13 +72,13 @@ class Entity:
     def getmovement(self):
         pass
 
+    def afterturn(self):
+        pass
+
 class TileFeature:
     def __init__(self,symbol, passable = True):
         self.symbol = symbol
         self.passable = passable
-
-    def onTouch(self, entity:Entity, game):
-        pass
 
 #Game handler
 class Game:
@@ -93,7 +91,7 @@ class Game:
         self.islost = False
 
     def startgame(self):
-        
+        self.grid.displaygrid(self.entities,self.player)
         while self.isplaying:
             if self.islost == True:
                 print("You Lose")
@@ -101,7 +99,7 @@ class Game:
                 return     
             self.player.isturn = True
             while self.player.isturn:
-                playermove = self.player.getmovement(input())
+                playermove = self.player.getmovement(input()[0])
                 print(playermove)
                 validity, newpos = self.grid.checkifvalidmove(self.player.position, playermove)
                 if not validity:
@@ -124,7 +122,7 @@ class Game:
                 currententity.currentturn = 0
                 while currententity.isturn == True:
                     currententity.currentturn += 1
-                    enemymove = currententity.getmovement()
+                    enemymove = currententity.getmovement(self.grid)
                     validity, newpos = self.grid.checkifvalidmove(currententity.position, enemymove)
                     if not validity:
                         continue
@@ -132,7 +130,8 @@ class Game:
                     self.grid.getcell(newpos).feature.onTouch(currententity, self)
                     if currententity.position == self.player.position:
                         self.islost = True
-                    print(f"{currententity.currentturn}; {currententity.turnlimit}")
+                    print(f"{currententity.symbol}: {currententity.currentturn}; {currententity.turnlimit}")
+                currententity.afterturn()
             print("------------------------:-------------------------")
             self.grid.displaygrid(self.entities,self.player)
         

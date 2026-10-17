@@ -13,6 +13,9 @@ ENTITIES = {
     "M": Entity.Mario,
     "J": Entity.Jem,
     "L": Entity.Luigi,
+    "A": Entity.Aki,
+    "W": Entity.Waluigi,
+    "H": Entity.Honami
 }
 
 def mapgenerator(level: str):

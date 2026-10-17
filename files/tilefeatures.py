@@ -1,5 +1,5 @@
 from classes import TileFeature
-from entitytypes import Player
+from entitytypes import Player, Enemy
 
 class Rock(TileFeature):
     def __init__(self):
@@ -12,6 +12,12 @@ class Trap(TileFeature):
     def onTouch(self,entity, game):
         if isinstance(entity, Player):
             game.islost = True
+
+        if isinstance(entity, Enemy):
+            entity:Enemy
+            entity.turnlimit = 0
+            self.passable = False
+            entity.istrapped = True
 
 class Goal(TileFeature):
     def __init__(self, passable=True):
