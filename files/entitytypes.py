@@ -1,17 +1,40 @@
 from classes import Entity, Grid
 from random import shuffle
+from ai import bfs
 
 #Enemy Subclass
 class Enemy(Entity):
     def __init__(self, position, turnlimit,symbol):
+        self.state = None
         super().__init__(position, symbol)
         self.target = None
         self.turnlimit = turnlimit +1
         self.currentturn = 0
+        self.istrapped = False
     
     def changetarget(self, newtarget: Entity):
         self.target = newtarget
 
+
+class Honami(Enemy):
+    def __init__(self, position):
+        super().__init__(position, 1, "H")
+        self.state = 0
+
+    def getmovement(self, grid: Grid):
+        if self.currentturn >= self.turnlimit:
+            self.isturn  = False        
+            return (0,0)
+        return bfs(self,grid)
+    
+    def afterturn(self):
+        if not self.istrapped:
+            self.state = (self.state + 1) % 3
+            self.turnlimit = self.state +1
+        
+    
+
+    
 
 class Mario(Enemy):
     def __init__(self, position):
@@ -28,7 +51,7 @@ class Mario(Enemy):
             potentialmoves.append((-1,0))
         elif xdir < 0:
             potentialmoves.append((1,0))
-        if ydir >= 0:
+        if ydir > 0:
             potentialmoves.append((0,-1))
         if ydir < 0:
             potentialmoves.append((0,1))
@@ -53,7 +76,7 @@ class Luigi(Enemy):
             potentialmoves.append((-1,0))
         elif xdir < 0:
             potentialmoves.append((1,0))
-        if ydir >= 0:
+        if ydir > 0:
             potentialmoves.append((0,-1))
         if ydir < 0:
             potentialmoves.append((0,1))
@@ -78,7 +101,7 @@ class Jem(Enemy):
             potentialmoves.append((0,-1))
         if ydir < 0:
             potentialmoves.append((0,1))
-        if xdir >= 0:
+        if xdir > 0:
             potentialmoves.append((-1,0))
         elif xdir < 0:
             potentialmoves.append((1,0))
@@ -97,37 +120,7 @@ class Aki(Enemy):
         if self.currentturn >= self.turnlimit:
             self.isturn = False        
             return (0, 0)        
-        
-        if self.position == self.target.position:
-            return (0, 0)
-        queue = []
-        visited = {tuple(self.position)}
-        cardinal_directions = [
-            (0, -1), 
-            (0, 1),   
-            (-1, 0),  
-            (1, 0)   
-        ]
-        for move in cardinal_directions:
-            validity, newpos = grid.checkifvalidmove(self.position, move)
-            if validity:
-                tuple_pos = tuple(newpos)
-                if tuple_pos not in visited:
-                    visited.add(tuple_pos)
-                    queue.append((newpos, move))
-        while queue:
-            current_pos, first_step = queue.pop(0)
-            if current_pos == self.target.position:
-                return first_step
-                
-            for move in cardinal_directions:
-                validity, next_pos = grid.checkifvalidmove(current_pos, move)
-                if validity:
-                    tuple_next = tuple(next_pos)
-                    if tuple_next not in visited:
-                        visited.add(tuple_next)
-                        queue.append((next_pos, first_step))
-        return (0, 0)
+        return bfs(self,grid)
 
 class Waluigi(Enemy):
     def __init__(self, position):
@@ -149,6 +142,8 @@ class Waluigi(Enemy):
             if validity:
                 return move
         return (0,0)
+
+
         
 
 class Player(Entity):

@@ -17,6 +17,7 @@ class Trap(TileFeature):
             entity:Enemy
             entity.turnlimit = 0
             self.passable = False
+            entity.istrapped = True
 
 class Goal(TileFeature):
     def __init__(self, passable=True):

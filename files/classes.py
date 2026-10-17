@@ -1,7 +1,7 @@
 ##General Idea: THe entire game order is handled by the Game Object, instantiated each time a game is started. 
 
 class Cell:
-    def __init__(self,name, height, feature = None):
+    def __init__(self,name, height):
         self.name = name
         self.height = height
 
@@ -72,13 +72,13 @@ class Entity:
     def getmovement(self):
         pass
 
+    def afterturn(self):
+        pass
+
 class TileFeature:
     def __init__(self,symbol, passable = True):
         self.symbol = symbol
         self.passable = passable
-
-    def onTouch(self, entity:Entity, game):
-        pass
 
 #Game handler
 class Game:
@@ -131,6 +131,7 @@ class Game:
                     if currententity.position == self.player.position:
                         self.islost = True
                     print(f"{currententity.symbol}: {currententity.currentturn}; {currententity.turnlimit}")
+                currententity.afterturn()
             print("------------------------:-------------------------")
             self.grid.displaygrid(self.entities,self.player)
         
